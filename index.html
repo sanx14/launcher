@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanX</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .login-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 5, 15, 0.95);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .login-overlay.active {
+      display: flex;
+    }
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 30px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      position: relative;
+    }
+    .login-box h2 {
+      font-family: var(--font-display);
+      color: var(--text-1);
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+    .login-box input {
+      width: 100%;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-1);
+      font-size: 1rem;
+      font-family: var(--font-body);
+    }
+    .login-box input:focus {
+      outline: none;
+      border-color: var(--grad-1);
+      box-shadow: 0 0 20px rgba(124, 108, 255, 0.3);
+    }
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      background: var(--gradient);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .login-box button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(124, 108, 255, 0.4);
+    }
+    .login-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: var(--text-2);
+      font-size: 2rem;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .login-close:hover {
+      color: var(--text-1);
+    }
+
+    /* Mobile responsive login */
+   @media (max-width: 650px) {
+  .login-overlay {
+    padding: 16px;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 12vh;
+    box-sizing: border-box;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 20px;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .login-box h2 {
+    font-size: 1.35rem;
+    margin-bottom: 20px;
+  }
+
+  .login-box input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+  }
+
+  .login-box button {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+    border-radius: var(--radius-sm);
+    margin-top: 8px;
+    box-sizing: border-box;
+  }
+
+  .login-close {
+    top: 12px;
+    right: 12px;
+    font-size: 1.8rem;
+    z-index: 100;
+  }
+}
+
+    @media (max-width: 480px) {
+      .login-overlay {
+        padding: 5px;
+        padding-top: 10vh;
+      }
+      .login-box {
+        padding: 20px 15px;
+        width: 100%;
+      }
+      .login-box h2 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+      .login-box input {
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+      }
+      .login-box button {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      .login-close {
+        top: 8px;
+        right: 8px;
+        font-size: 1.5rem;
+      }
+
+      /* Landing / short screens — keep login box usable */
+      .login-overlay {
+        overflow-y: auto;
+      }
+
+      .login-box {
+        max-height: calc(100vh - 40px);
+        max-height: calc(100dvh - 40px);
+        overflow-y: auto;
+      }
+
+      /* Mobile responsive APK section */
+      .apk-section {
+        padding: 80px 20px;
+      }
+
+      .apk-section h1 {
+        font-size: 2.2rem;
+        margin-bottom: 16px;
+      }
+
+      .apk-section p {
+        font-size: 1rem;
+        margin-bottom: 32px;
+      }
+
+      .apk-list {
+        gap: 20px;
+      }
+
+      .apk-item {
+        padding: 24px;
+      }
+
+      .apk-item h3 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+      }
+
+      .apk-item p {
+        font-size: 0.9rem;
+        margin-bottom: 18px;
+      }
+
+      .apk-button {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+      }
+
+      .apk-section {
+        padding: 60px 16px;
+      }
+
+      .apk-section h1 {
+        font-size: 1.9rem;
+      }
+    }
+    .hidden-page {
+      display: none;
+    }
+    .hidden-page.active {
+      display: block;
+    }
+    .apk-section {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 120px 24px;
+    }
+    .apk-section h1 {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      color: var(--text-1);
+      margin-bottom: 20px;
+    }
+    .apk-section p {
+      color: var(--text-2);
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+    }
+    .apk-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .apk-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .apk-item:hover {
+      transform: translateY(-8px);
+      border-color: var(--border-strong);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+    .apk-item h3 {
+      font-family: var(--font-display);
+      color: var(--text-1);
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+    .apk-item p {
+      color: var(--text-2);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+    .apk-button {
+      display: inline-block;
+      padding: 14px 36px;
+      background: var(--gradient);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 8px 24px rgba(124, 108, 255, 0.4);
+    }
+    .apk-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(124, 108, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Overlay -->
+  <div class="login-overlay" id="loginOverlay">
+    <span class="login-close" id="loginClose">&times;</span>
+    <div class="login-box">
+      <h2>Login</h2>
+      <input type="text" id="loginUsername" placeholder="Username" autocomplete="off">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button onclick="checkLogin()">Login</button>
+    </div>
+  </div>
+
+  <!-- Hidden APK Page -->
+  <div class="hidden-page" id="apkPage">
+    <div class="apk-section">
+      <h1>Welcome!</h1>
+      <p>You have successfully logged in. Download the APKs below:</p>
+      <div class="apk-list">
+        <div class="apk-item">
+          <h3>App 1 - WhatsApp Blocker</h3>
+          <p>Advanced WhatsApp Chats and Calls blocker</p>
+          <a href="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID_1" class="apk-button">
+            <i class="fas fa-download"></i> Download APK
+          </a>
+        </div>
+        <div class="apk-item">
+          <h3>App 2 - Cellular Blocker</h3>
+          <p>Block incoming and outgoing calls silently</p>
+          <a href="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID_2" class="apk-button">
+            <i class="fas fa-download"></i> Download APK
+          </a>
+        </div>
+        <div class="apk-item">
+          <h3>App 3 - ERP System</h3>
+          <p>College Management System</p>
+          <a href="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID_3" class="apk-button">
+            <i class="fas fa-download"></i> Download APK
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="javascript:void(0)" class="logo" onclick="showLogin()">S<span class="logo-dot"></span></a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <p class="hero-greeting">Hello, I'm</p>
+      <h1 class="hero-name">Sanjeevee.S</h1>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">View My Work</a>
+        <a href="#contact" class="btn btn-outline">Get In Touch</a>
+      </div>
+      <div class="hero-socials">
+        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <a href="#about" class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section about">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">About Me</p>
+        <h2 class="section-title">Passionate about building smarter automation</h2>
+      </div>
+      <div class="about-text">
+        <h3 class="about-heading">I'm Sanjeevee, a Software Engineer</h3>
+        <p class="about-highlight">
+          I specialize in building innovative educational hacking tools. With a deep understanding of system internals, I create solutions for Daily Automation.
+        </p>
+        <a href="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID_RESUME" class="btn btn-primary">Download Resume</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="section skills">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">My Skills</p>
+        <h2 class="section-title">My Toolkit</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fab fa-html5"></i></div>
+          <h3>HTML & CSS</h3>
+          <p>Semantic markup, responsive layouts, modern styling</p>
+          <div class="skill-bar"><div class="skill-fill" data-width="80%" style="width: 80%;"></div></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fab fa-js"></i></div>
+          <h3>JavaScript</h3>
+          <p>Interactive web apps, DOM manipulation, ES6+</p>
+          <div class="skill-bar"><div class="skill-fill" data-width="50%" style="width: 50%;"></div></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fab fa-css3-alt"></i></div>
+          <h3>Tailwind CSS</h3>
+          <p>Utility-first styling, rapid UI development</p>
+          <div class="skill-bar"><div class="skill-fill" data-width="80%" style="width: 80%;"></div></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fas fa-code"></i></div>
+          <h3>Java & Python</h3>
+          <p>Object-oriented programming, scripting, automation</p>
+          <div class="skill-bar"><div class="skill-fill" data-width="80%" style="width: 80%;"></div></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fas fa-database"></i></div>
+          <h3>SQL</h3>
+          <p>Database design, queries, data management</p>
+          <div class="skill-bar"><div class="skill-fill" data-width="60%" style="width: 60%;"></div></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fab fa-linux"></i></div>
+          <h3>Debian / Linux</h3>
+          <p>System administration, shell scripting, networking</p>
+          <div class="skill-bar"><div class="skill-fill" data-width="60%" style="width: 60%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="section projects">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">My Work</p>
+        <h2 class="section-title">Projects</h2>
+      </div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="project-info">
+            <h3>Diapitic Prediction App</h3>
+            <p>AI-powered diapitic tool that predicts diseases based on symptoms using machine learning algorithms for early detection.</p>
+            <div class="project-tags">
+              <span>Python</span><span>TensorFlow</span><span>Kivy</span>
+            </div>
+            <div class="project-links">
+              <a href="#" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+              <a href="#" aria-label="Source Code"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="project-info">
+            <h3>LMS - Learning Management System</h3>
+            <p>Comprehensive educational platform for course management, student tracking, assignments, and interactive learning experiences.</p>
+            <div class="project-tags">
+              <span>HTML and CSS</span><span>Node.js</span><span>MariaDb</span>
+            </div>
+            <div class="project-links">
+              <a href="#" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+              <a href="#" aria-label="Source Code"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="project-info">
+            <h3>ERP System</h3>
+            <p>For College Management</p>
+            <div class="project-tags">
+              <span>Node.js</span><span>HTML and CSS</span><span>MySQL</span>
+            </div>
+            <div class="project-links">
+              <a href="#" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+              <a href="#" aria-label="Source Code"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div class="project-info">
+            <h3>WhatsApp BLOCKER</h3>
+            <p>Advanced WhatsApp Chats and Calls blocker. Control externally from another mobile.</p>
+            <div class="project-tags">
+              <span>kotlin</span><span>jave</span><span>xml</span>
+            </div>
+            <div class="project-links">
+              <a href="#" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+              <a href="#" aria-label="Source Code"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="project-info">
+            <h3>Cellular Blocker</h3>
+            <p>Block incoming and outgoing calls silently without notification. External control.</p>
+            <div class="project-tags">
+              <span>Java</span><span>Android</span><span>xml</span>
+            </div>
+            <div class="project-links">
+              <a href="#" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+              <a href="#" aria-label="Source Code"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-image" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+            <i class="fas fa-server"></i>
+          </div>
+          <div class="project-info">
+            <h3>Server-Driven Website</h3>
+            <p>Access of Your Data Any where using API</p>
+            <div class="project-tags">
+              <span>Node.js</span><span>HTML & CSS</span>
+            </div>
+            <div class="project-links">
+              <a href="#" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+              <a href="#" aria-label="Source Code"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section contact">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">Contact</p>
+      </div>
+      <div class="contact-wrapper">
+        <div class="contact-info">
+          <p class="contact-description">
+            Feel free to reach out to me for any questions or opportunities.
+          </p>
+          <div class="contact-details">
+            <div class="contact-item">
+              <i class="fas fa-envelope"></i>
+              <div>
+                <h4>Email</h4>
+                <a href="mailto:sanjeevee.sathishkumar@gmail.com">sanjeevee.sathishkumar@gmail.com</a>
+              </div>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-phone"></i>
+              <div>
+                <h4>Phone</h4>
+                <a href="tel:+919876543210">+91 9443073739</a>
+              </div>
+            </div>
+            <div class="contact-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <div>
+                <h4>Location</h4>
+                <p>India,TamilNadu</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <a href="#home" class="logo">Back to home<span class="logo-dot"></span></a>
+        <p>&copy; 2026 Sanjeevee.S. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="index.js"></script>
+</body>
+</html>
+
