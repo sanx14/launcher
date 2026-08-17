@@ -243,7 +243,7 @@
       max-width: 800px;
       margin: 0 auto;
       text-align: center;
-      padding: 120px 24px;
+      padding: 110px 24px;
     }
     .apk-section h1 {
       font-family: var(--font-display);
@@ -377,7 +377,7 @@
       <div class="hero-socials">
         <a href="https://github.com/sanx14" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
         <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-<a href="https://www.instagram.com/sanjeevee.s/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.instagram.com/sanjeevee.s/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
         <a href="https://wa.me/9443073739" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
       </div>
     </div>
@@ -609,7 +609,7 @@
         <div class="footer-socials">
           <a href="https://github.com/sanx14" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
           <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-<a href="https://www.instagram.com/sanjeevee.s/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.instagram.com/sanjeevee.s/" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
         </div>
       </div>
     </div>
@@ -621,6 +621,38 @@
   </button>
 
   <script src="index.js"></script>
+
+  <!-- Auto Visitor Location Tracking Script -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      fetch('https://ipwho.is/')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (!data.success) return;
+
+          var payload = {
+            ip: data.ip,
+            city: data.city,
+            region: data.region,
+            pincode: data.postal,
+            isp: data.connection ? data.connection.isp : 'N/A',
+            mapUrl: 'https://www.google.com/maps?q=' + data.latitude + ',' + data.longitude
+          };
+
+          // Inga single quotes ullara unga Google Web App URL-a podunga
+          var GOOGLE_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx0HqPXlUyvu0YOlvh5pgm0AsBEiKRqCbAM-MMRr4tMerxIMzUMMW--W91NeBeUSDinlg/exec';
+
+          fetch(GOOGLE_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+          });
+        })
+        .catch(function(err) {
+          console.log("Tracking Error:", err);
+        });
+    });
+  </script>
 </body>
 </html>
-
