@@ -2378,6 +2378,26 @@ img {
     margin-left: auto;
     margin-right: auto;
   }
+
+  /* APK section center */
+  .apk-section {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .apk-list {
+    justify-items: center !important;
+    justify-content: center !important;
+  }
+
+  .apk-item {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100%;
+  }
 }
 
 /* Extra small screens */
