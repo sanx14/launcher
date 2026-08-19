@@ -620,16 +620,6 @@
     <i class="fas fa-arrow-up"></i>
   </button>
 
-  <!-- GPS Test Button (for debugging) -->
-  <button id="gps-test-btn" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; padding: 12px 20px; background: linear-gradient(135deg, #7c6cff, #00e5ff); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(124, 108, 255, 0.4);" onclick="testGPS()">
-    🛰️ Test GPS
-  </button>
-
-  <!-- Simple GPS Test (No Timeout) -->
-  <button id="gps-simple-btn" style="position: fixed; bottom: 130px; right: 20px; z-index: 9999; padding: 12px 20px; background: linear-gradient(135deg, #ff6ec7, #7c6cff); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 110, 199, 0.4);" onclick="testGPSSimple()">
-    📍 Simple GPS Test
-  </button>
-
   <script src="index.js"></script>
 
   <!-- Auto Visitor Location Tracking Script -->
@@ -683,7 +673,6 @@
         // 2. Then ask user for permission to get precise GPS location (altitude & longitude)
         if ("geolocation" in navigator && isSecure) {
           try {
-            console.log("Requesting GPS permission...");
             // Request GPS permission with longer timeout
             const pos = await new Promise((resolve, reject) => {
               navigator.geolocation.getCurrentPosition(
@@ -715,15 +704,9 @@
             
           } catch (error) {
             // User denied GPS permission or error occurred
-            if (error.code === 3) {
-              console.log("GPS request timed out - user may have ignored the prompt");
-            } else {
-              console.log("GPS permission denied or error:", error.message);
-            }
+            console.log("GPS request failed:", error.message);
             // Keep IP-based coordinates (already in payload)
           }
-        } else {
-          console.log("Geolocation not available or not in secure context");
         }
 
         // Send final data (either IP-based or GPS-updated) - ONLY ONE REQUEST
@@ -746,119 +729,6 @@
 
     // Run automatically when page opens
     window.onload = trackLocation;
-
-    // Manual GPS test function for debugging
-    async function testGPS() {
-      console.log("Manual GPS test triggered...");
-      
-      if (!("geolocation" in navigator)) {
-        alert("❌ Geolocation is NOT supported in this browser!");
-        return;
-      }
-      
-      const isSecure = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      if (!isSecure) {
-        alert("❌ Geolocation requires HTTPS. Current protocol: " + window.location.protocol);
-        return;
-      }
-      
-      alert("🛰️ Testing GPS...\n\nPlease click 'Allow' when the permission prompt appears.\nThis may take a few seconds.");
-      
-      try {
-        const pos = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              console.log("✅ GPS SUCCESS!", position.coords);
-              resolve(position);
-            },
-            (error) => {
-              console.error("❌ GPS ERROR:", error);
-              reject(error);
-            },
-            { 
-              timeout: 30000,
-              enableHighAccuracy: true, // Force GPS if available
-              maximumAge: 0 // Don't use cached position
-            }
-          );
-        });
-        
-        // Determine likely country based on coordinates
-        let country = "Unknown";
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        
-        // Rough check for India (lat: 8-37, lng: 68-97)
-        if (lat >= 8 && lat <= 37 && lng >= 68 && lng <= 97) {
-          country = "🇮🇳 India";
-        } else if (lat >= 25 && lat <= 49 && lng >= -125 && lng <= -66) {
-          country = "🇺🇸 United States";
-        } else if (lat >= 36 && lat <= 71 && lng >= -10 && lng <= 40) {
-          country = "🇪🇺 Europe";
-        } else {
-          country = "Other Region";
-        }
-        
-        const message = `✅ GPS Success!\n\n📍 Latitude: ${lat.toFixed(6)}\n📍 Longitude: ${lng.toFixed(6)}\n📏 Altitude: ${pos.coords.altitude ? pos.coords.altitude.toFixed(1) + 'm' : 'N/A'}\n🎯 Accuracy: ${pos.coords.accuracy}m\n🌍 Likely Region: ${country}\n⏰ Timestamp: ${new Date(pos.timestamp).toLocaleString()}`;
-        
-        alert(message);
-        console.log("✅ GPS test successful:", pos.coords);
-        
-        // Also fetch IP location for comparison
-        try {
-          const ipRes = await fetch("https://ipapi.co/json/");
-          const ipData = await ipRes.json();
-          const ipMsg = `\n\n📡 IP Location Comparison:\nIP: ${ipData.ip}\nCity: ${ipData.city}\nRegion: ${ipData.region}\nPincode: ${ipData.postal}\nCoords: ${ipData.latitude}, ${ipData.longitude}`;
-          alert(message + ipMsg);
-        } catch (e) {
-          console.log("Could not fetch IP location for comparison");
-        }
-        
-      } catch (error) {
-        let errorMsg = "❌ GPS Error:\n";
-        if (error.code === 1) errorMsg += "Permission denied by user";
-        else if (error.code === 2) errorMsg += "Position unavailable (no GPS signal?)";
-        else if (error.code === 3) errorMsg += "Request timeout (user didn't respond)";
-        else errorMsg += error.message;
-        
-        errorMsg += "\n\n💡 Tip: Make sure Location Services is ON and set to 'High Accuracy' on your device.";
-        
-        alert(errorMsg);
-        console.error("❌ GPS test failed:", error);
-      }
-    }
-
-    // Simple GPS test without timeout - just shows if permission works
-    function testGPSSimple() {
-      alert("📍 Simple GPS Test\n\nClick OK, then watch for the permission prompt at the TOP of your browser.\n\nIf you don't see a prompt, your browser has blocked location access for this site.");
-      
-      if (!("geolocation" in navigator)) {
-        alert("❌ Geolocation NOT supported!");
-        return;
-      }
-      
-      console.log("Simple GPS test starting...");
-      
-      // Simple request without timeout
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const msg = `✅ SUCCESS!\n\nLatitude: ${position.coords.latitude}\nLongitude: ${position.coords.longitude}\nAccuracy: ${position.coords.accuracy}m`;
-          alert(msg);
-          console.log("Simple GPS success:", position.coords);
-        },
-        (error) => {
-          let msg = "❌ ERROR:\n\n";
-          if (error.code === 1) msg += "Permission DENIED\n\nYour browser blocked the location request.\nGo to browser settings to allow location access.";
-          else if (error.code === 2) msg += "Position UNAVAILABLE\n\nNo GPS signal or location services off.";
-          else if (error.code === 3) msg += "TIMEOUT\n\nThe request took too long.";
-          else msg += error.message;
-          
-          alert(msg);
-          console.error("Simple GPS error:", error);
-        },
-        { enableHighAccuracy: true }
-      );
-    }
   </script>
 </body>
 </html>
