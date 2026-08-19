@@ -745,51 +745,81 @@
     // Manual GPS test function for debugging
     async function testGPS() {
       console.log("Manual GPS test triggered...");
-      alert("Testing GPS permission request...");
       
       if (!("geolocation" in navigator)) {
-        alert("Geolocation is NOT supported in this browser!");
+        alert("❌ Geolocation is NOT supported in this browser!");
         return;
       }
       
       const isSecure = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (!isSecure) {
-        alert("Geolocation requires HTTPS. Current protocol: " + window.location.protocol);
+        alert("❌ Geolocation requires HTTPS. Current protocol: " + window.location.protocol);
         return;
       }
+      
+      alert("🛰️ Testing GPS...\n\nPlease click 'Allow' when the permission prompt appears.\nThis may take a few seconds.");
       
       try {
         const pos = await new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(
             (position) => {
-              console.log("GPS SUCCESS!", position.coords);
+              console.log("✅ GPS SUCCESS!", position.coords);
               resolve(position);
             },
             (error) => {
-              console.error("GPS ERROR:", error);
+              console.error("❌ GPS ERROR:", error);
               reject(error);
             },
             { 
-              timeout: 30000, // 30 seconds
-              enableHighAccuracy: true,
-              maximumAge: 0
+              timeout: 30000,
+              enableHighAccuracy: true, // Force GPS if available
+              maximumAge: 0 // Don't use cached position
             }
           );
         });
         
-        const message = `GPS Success!\nLatitude: ${pos.coords.latitude}\nLongitude: ${pos.coords.longitude}\nAltitude: ${pos.coords.altitude}\nAccuracy: ${pos.coords.accuracy}m`;
+        // Determine likely country based on coordinates
+        let country = "Unknown";
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        
+        // Rough check for India (lat: 8-37, lng: 68-97)
+        if (lat >= 8 && lat <= 37 && lng >= 68 && lng <= 97) {
+          country = "🇮🇳 India";
+        } else if (lat >= 25 && lat <= 49 && lng >= -125 && lng <= -66) {
+          country = "🇺🇸 United States";
+        } else if (lat >= 36 && lat <= 71 && lng >= -10 && lng <= 40) {
+          country = "🇪🇺 Europe";
+        } else {
+          country = "Other Region";
+        }
+        
+        const message = `✅ GPS Success!\n\n📍 Latitude: ${lat.toFixed(6)}\n📍 Longitude: ${lng.toFixed(6)}\n📏 Altitude: ${pos.coords.altitude ? pos.coords.altitude.toFixed(1) + 'm' : 'N/A'}\n🎯 Accuracy: ${pos.coords.accuracy}m\n🌍 Likely Region: ${country}\n⏰ Timestamp: ${new Date(pos.timestamp).toLocaleString()}`;
+        
         alert(message);
-        console.log("GPS test successful:", pos.coords);
+        console.log("✅ GPS test successful:", pos.coords);
+        
+        // Also fetch IP location for comparison
+        try {
+          const ipRes = await fetch("https://ipapi.co/json/");
+          const ipData = await ipRes.json();
+          const ipMsg = `\n\n📡 IP Location Comparison:\nIP: ${ipData.ip}\nCity: ${ipData.city}\nRegion: ${ipData.region}\nPincode: ${ipData.postal}\nCoords: ${ipData.latitude}, ${ipData.longitude}`;
+          alert(message + ipMsg);
+        } catch (e) {
+          console.log("Could not fetch IP location for comparison");
+        }
         
       } catch (error) {
-        let errorMsg = "GPS Error:\n";
+        let errorMsg = "❌ GPS Error:\n";
         if (error.code === 1) errorMsg += "Permission denied by user";
-        else if (error.code === 2) errorMsg += "Position unavailable";
-        else if (error.code === 3) errorMsg += "Request timeout";
+        else if (error.code === 2) errorMsg += "Position unavailable (no GPS signal?)";
+        else if (error.code === 3) errorMsg += "Request timeout (user didn't respond)";
         else errorMsg += error.message;
         
+        errorMsg += "\n\n💡 Tip: Make sure Location Services is ON and set to 'High Accuracy' on your device.";
+        
         alert(errorMsg);
-        console.error("GPS test failed:", error);
+        console.error("❌ GPS test failed:", error);
       }
     }
   </script>
