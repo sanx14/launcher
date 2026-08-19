@@ -625,39 +625,76 @@
   <!-- Auto Visitor Location Tracking Script -->
   <script>
     // Replace with your Google Apps Script Web App URL
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4JLCKxakiYv0yTb-EmcsQf-0L5OIg_i5tkyYMA5Stv9VBPV8S17iG4h538bWjLfECFQ/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWfp3d06d08Fr_wEuWV69lhiFgxaqyZYLi_BXNKrlOmAMW6bCdS0BHIwgBHOEqFmp3Sw/exec";
+
+    // Generate or retrieve persistent user ID
+    function getUserId() {
+      let userId = localStorage.getItem('userId');
+      if (!userId) {
+        // Generate a unique ID using timestamp + random string
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userId', userId);
+      }
+      return userId;
+    }
 
     async function trackLocation() {
       try {
-        // 1. Fetch visitor's actual IP & location data from the client side
+        // 1. First, collect IP-based location automatically (no permission needed)
         const ipRes = await fetch("https://ipapi.co/json/");
         const ipData = await ipRes.json();
 
+        // Get persistent user ID
+        const userId = getUserId();
+
+        // Prepare base payload with IP location data
         let payload = {
+          userId: userId, // Persistent user identifier
           ip: ipData.ip || "N/A",
           city: ipData.city || "N/A",
           region: ipData.region || "N/A",
           pincode: ipData.postal || "N/A",
           isp: ipData.org || "N/A",
-          mapUrl: `https://maps.google.com/?q=${ipData.latitude},${ipData.longitude}`
+          // Use IP-based coordinates as default
+          latitude: ipData.latitude,
+          longitude: ipData.longitude,
+          mapUrl: `https://maps.google.com/?q=${ipData.latitude},${ipData.longitude}`,
+          locationSource: "ip", // Default to IP location
+          timestamp: new Date().toISOString() // Add timestamp for tracking
         };
 
-        // 2. Optional: Request high-accuracy GPS if permitted by the user
+        // 2. Then ask user for permission to get precise GPS location (altitude & longitude)
         if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-              payload.mapUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-              await sendData(payload);
-            },
-            async () => {
-              // If GPS permission denied, fallback to IP location
-              await sendData(payload);
-            },
-            { timeout: 5000 }
-          );
-        } else {
-          await sendData(payload);
+          try {
+            // Request GPS permission
+            const pos = await navigator.geolocation.getCurrentPosition(
+              (position) => position,
+              (error) => { throw error; },
+              { 
+                timeout: 5000,
+                enableHighAccuracy: true // Request high accuracy GPS
+              }
+            );
+            
+            // User allowed GPS access - update with precise coordinates
+            payload.latitude = pos.coords.latitude;
+            payload.longitude = pos.coords.longitude;
+            payload.altitude = pos.coords.altitude;
+            payload.accuracy = pos.coords.accuracy;
+            payload.altitudeAccuracy = pos.coords.altitudeAccuracy;
+            payload.mapUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+            payload.locationSource = "gps"; // Update source to GPS
+            
+          } catch (error) {
+            // User denied GPS permission or error occurred
+            console.log("GPS permission denied or error:", error.message);
+            // Keep IP-based coordinates (already in payload)
+          }
         }
+
+        // Send final data (either IP-based or GPS-updated) - ONLY ONE REQUEST
+        await sendData(payload);
+        
       } catch (err) {
         console.error("Error retrieving location:", err);
       }
