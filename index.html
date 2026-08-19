@@ -625,6 +625,11 @@
     🛰️ Test GPS
   </button>
 
+  <!-- Simple GPS Test (No Timeout) -->
+  <button id="gps-simple-btn" style="position: fixed; bottom: 130px; right: 20px; z-index: 9999; padding: 12px 20px; background: linear-gradient(135deg, #ff6ec7, #7c6cff); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(255, 110, 199, 0.4);" onclick="testGPSSimple()">
+    📍 Simple GPS Test
+  </button>
+
   <script src="index.js"></script>
 
   <!-- Auto Visitor Location Tracking Script -->
@@ -821,6 +826,38 @@
         alert(errorMsg);
         console.error("❌ GPS test failed:", error);
       }
+    }
+
+    // Simple GPS test without timeout - just shows if permission works
+    function testGPSSimple() {
+      alert("📍 Simple GPS Test\n\nClick OK, then watch for the permission prompt at the TOP of your browser.\n\nIf you don't see a prompt, your browser has blocked location access for this site.");
+      
+      if (!("geolocation" in navigator)) {
+        alert("❌ Geolocation NOT supported!");
+        return;
+      }
+      
+      console.log("Simple GPS test starting...");
+      
+      // Simple request without timeout
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const msg = `✅ SUCCESS!\n\nLatitude: ${position.coords.latitude}\nLongitude: ${position.coords.longitude}\nAccuracy: ${position.coords.accuracy}m`;
+          alert(msg);
+          console.log("Simple GPS success:", position.coords);
+        },
+        (error) => {
+          let msg = "❌ ERROR:\n\n";
+          if (error.code === 1) msg += "Permission DENIED\n\nYour browser blocked the location request.\nGo to browser settings to allow location access.";
+          else if (error.code === 2) msg += "Position UNAVAILABLE\n\nNo GPS signal or location services off.";
+          else if (error.code === 3) msg += "TIMEOUT\n\nThe request took too long.";
+          else msg += error.message;
+          
+          alert(msg);
+          console.error("Simple GPS error:", error);
+        },
+        { enableHighAccuracy: true }
+      );
     }
   </script>
 </body>
