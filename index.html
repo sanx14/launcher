@@ -679,7 +679,7 @@
         if ("geolocation" in navigator && isSecure) {
           try {
             console.log("Requesting GPS permission...");
-            // Request GPS permission
+            // Request GPS permission with longer timeout
             const pos = await new Promise((resolve, reject) => {
               navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -691,7 +691,7 @@
                   reject(error);
                 },
                 { 
-                  timeout: 10000,
+                  timeout: 30000, // 30 seconds - give user more time to respond
                   enableHighAccuracy: true, // Request high accuracy GPS
                   maximumAge: 0 // Don't use cached position
                 }
@@ -710,7 +710,11 @@
             
           } catch (error) {
             // User denied GPS permission or error occurred
-            console.log("GPS permission denied or error:", error.message);
+            if (error.code === 3) {
+              console.log("GPS request timed out - user may have ignored the prompt");
+            } else {
+              console.log("GPS permission denied or error:", error.message);
+            }
             // Keep IP-based coordinates (already in payload)
           }
         } else {
@@ -766,7 +770,7 @@
               reject(error);
             },
             { 
-              timeout: 10000,
+              timeout: 30000, // 30 seconds
               enableHighAccuracy: true,
               maximumAge: 0
             }
