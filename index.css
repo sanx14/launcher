@@ -91,6 +91,22 @@ body::after {
 a {
   text-decoration: none;
   color: inherit;
+  touch-action: manipulation;
+}
+
+/* Ensure clickable areas are finger-friendly */
+@media (max-width: 768px) {
+  a, button, .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .hero-socials a,
+  .footer-socials a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 ul {
@@ -99,13 +115,37 @@ ul {
 
 img {
   max-width: 100%;
+  height: auto;
   display: block;
+  object-fit: cover;
+}
+
+/* Responsive images */
+@media (max-width: 768px) {
+  img {
+    max-width: 100%;
+  }
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
+  width: 100%;
+}
+
+/* Responsive container adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
 }
 
 /* Custom scrollbar */
@@ -406,6 +446,23 @@ img {
   flex-wrap: wrap;
   margin-bottom: 52px;
   animation: fadeInUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Responsive hero actions */
+@media (max-width: 480px) {
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+  }
+  
+  .hero-actions .btn {
+    width: 100%;
+    max-width: 280px;
+  }
 }
 
 /* ===== Buttons ===== */
@@ -419,6 +476,8 @@ img {
   letter-spacing: 0.3px;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
+  min-height: 48px; /* Touch target size */
+  touch-action: manipulation;
   border: none;
   font-family: var(--font-body);
   overflow: hidden;
@@ -751,8 +810,9 @@ img {
 
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
+  width: 100%;
 }
 
 .skill-card {
@@ -898,8 +958,9 @@ img {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 26px;
+  width: 100%;
 }
 
 .project-card {
@@ -1063,8 +1124,9 @@ img {
 
 .contact-details {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
+  width: 100%;
 }
 
 .contact-item {
@@ -1624,6 +1686,10 @@ img {
 
 /* ===== Extra Small Screens ===== */
 @media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
   .section {
     padding: 60px 0;
   }
@@ -1649,18 +1715,23 @@ img {
 
   .section-title {
     margin-bottom: 40px;
+    font-size: 1.75rem;
   }
 
   .hero {
     padding: 90px 16px 40px;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   .hero-name {
     margin-bottom: 24px;
+    font-size: clamp(2.5rem, 12vw, 3.5rem);
   }
 
   .hero-greeting {
     margin-bottom: 18px;
+    font-size: clamp(0.8rem, 3vw, 1rem);
   }
 
   .hero-actions {
@@ -1670,6 +1741,7 @@ img {
 
   .hero-actions .btn {
     padding: 14px 28px;
+    font-size: 0.95rem;
   }
 
   .hero-socials {
@@ -1694,6 +1766,7 @@ img {
   .about-text p {
     font-size: 1rem;
     margin-bottom: 16px;
+    line-height: 1.6;
   }
 
   .about-text p:first-child {
@@ -1703,10 +1776,12 @@ img {
   .about-highlight {
     font-size: 1rem;
     margin-bottom: 16px;
+    padding: 16px 20px;
   }
 
   .about-heading {
     margin-bottom: 14px;
+    font-size: 1.5rem;
   }
 
   .skill-icon {
@@ -1718,22 +1793,26 @@ img {
 
   .skill-bar {
     height: 10px;
+    border-radius: 5px;
   }
 
   .contact-description {
     margin-bottom: 32px;
     font-size: 1rem;
+    line-height: 1.6;
   }
 
   .contact-item {
     padding: 18px 16px;
     gap: 14px;
+    border-radius: var(--radius-sm);
   }
 
   .contact-item i {
     width: 48px;
     height: 48px;
     font-size: 1.15rem;
+    border-radius: 10px;
   }
 
   .contact-item h4 {
@@ -1743,25 +1822,30 @@ img {
   .contact-item a,
   .contact-item p {
     font-size: 0.9rem;
+    line-height: 1.5;
   }
 
   .project-image {
     height: 180px;
     font-size: 3.2rem;
+    border-radius: var(--radius);
   }
 
   .project-info {
     padding: 20px;
+    border-radius: 0 0 var(--radius) var(--radius);
   }
 
   .project-info p {
     font-size: 0.85rem;
     margin-bottom: 14px;
+    line-height: 1.6;
   }
 
   .project-tags span {
     padding: 3px 8px;
     font-size: 0.68rem;
+    border-radius: 4px;
   }
 
   .footer {
@@ -1774,12 +1858,14 @@ img {
 
   .footer-content p {
     font-size: 0.85rem;
+    line-height: 1.6;
   }
 
   .footer-socials a {
     width: 38px;
     height: 38px;
     font-size: 1rem;
+    border-radius: 8px;
   }
 
   .back-to-top {
@@ -1788,6 +1874,7 @@ img {
     width: 44px;
     height: 44px;
     font-size: 0.95rem;
+    border-radius: 50%;
   }
 
   .nav-container {
@@ -1798,6 +1885,7 @@ img {
     padding: 14px 28px;
     font-size: 1rem;
     max-width: 240px;
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -1820,6 +1908,124 @@ img {
   .nav-container {
     padding-left: max(20px, env(safe-area-inset-left) + 12px);
     padding-right: max(20px, env(safe-area-inset-right) + 12px);
+  }
+  
+  .container {
+    padding-left: max(24px, env(safe-area-inset-left) + 16px);
+    padding-right: max(24px, env(safe-area-inset-right) + 16px);
+  }
+}
+
+/* ===== Fluid Typography for Better Scaling ===== */
+@media (min-width: 320px) and (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  h1, .hero-name {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+  }
+  
+  h2, .section-title {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+  }
+  
+  h4 {
+    font-size: clamp(1.1rem, 3.5vw, 1.25rem);
+  }
+  
+  p, li, a, span {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    line-height: 1.6;
+  }
+}
+
+/* ===== Height-Based Adjustments ===== */
+@media (max-height: 600px) {
+  .hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: 80px;
+    padding-bottom: 30px;
+  }
+  
+  .hero-content {
+    transform: scale(0.95);
+  }
+  
+  .section {
+    padding: 40px 0;
+  }
+  
+  .hero-scroll {
+    bottom: 20px;
+  }
+  
+  .back-to-top {
+    bottom: 12px;
+  }
+}
+
+@media (max-height: 500px) {
+  .hero {
+    padding-top: 70px;
+  }
+  
+  .hero-content {
+    transform: scale(0.9);
+  }
+  
+  .hero-greeting {
+    margin-bottom: 12px;
+  }
+  
+  .hero-name {
+    margin-bottom: 16px;
+  }
+  
+  .hero-actions {
+    margin-bottom: 24px;
+  }
+}
+
+/* ===== Ultra-Wide Screens ===== */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1400px;
+  }
+  
+  html {
+    font-size: 18px;
+  }
+  
+  .hero-content::before {
+    width: 700px;
+    height: 700px;
+  }
+}
+
+/* ===== Tablet Portrait and Larger Phones ===== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    max-width: 90%;
+  }
+  
+  .hero-name {
+    font-size: clamp(3rem, 8vw, 4.5rem);
+  }
+  
+  .hero-content::before {
+    width: 500px;
+    height: 500px;
+  }
+  
+  .skill-card,
+  .project-card {
+    max-width: 90%;
   }
 }
 
