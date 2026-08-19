@@ -640,6 +640,13 @@
 
     async function trackLocation() {
       try {
+        // Check if site is secure (HTTPS or localhost)
+        const isSecure = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        
+        if (!isSecure) {
+          console.warn('Geolocation requires a secure context (HTTPS or localhost). Skipping GPS request.');
+        }
+
         // 1. First, collect IP-based location automatically (no permission needed)
         const ipRes = await fetch("https://ipapi.co/json/");
         const ipData = await ipRes.json();
@@ -664,17 +671,27 @@
         };
 
         // 2. Then ask user for permission to get precise GPS location (altitude & longitude)
-        if ("geolocation" in navigator) {
+        if ("geolocation" in navigator && isSecure) {
           try {
+            console.log("Requesting GPS permission...");
             // Request GPS permission
-            const pos = await navigator.geolocation.getCurrentPosition(
-              (position) => position,
-              (error) => { throw error; },
-              { 
-                timeout: 5000,
-                enableHighAccuracy: true // Request high accuracy GPS
-              }
-            );
+            const pos = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  console.log("GPS permission granted!");
+                  resolve(position);
+                },
+                (error) => {
+                  console.log("GPS permission error:", error.code, error.message);
+                  reject(error);
+                },
+                { 
+                  timeout: 10000,
+                  enableHighAccuracy: true, // Request high accuracy GPS
+                  maximumAge: 0 // Don't use cached position
+                }
+              );
+            });
             
             // User allowed GPS access - update with precise coordinates
             payload.latitude = pos.coords.latitude;
@@ -684,16 +701,20 @@
             payload.altitudeAccuracy = pos.coords.altitudeAccuracy;
             payload.mapUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
             payload.locationSource = "gps"; // Update source to GPS
+            console.log("GPS coordinates obtained:", pos.coords.latitude, pos.coords.longitude);
             
           } catch (error) {
             // User denied GPS permission or error occurred
             console.log("GPS permission denied or error:", error.message);
             // Keep IP-based coordinates (already in payload)
           }
+        } else {
+          console.log("Geolocation not available or not in secure context");
         }
 
         // Send final data (either IP-based or GPS-updated) - ONLY ONE REQUEST
         await sendData(payload);
+        console.log("Location data sent to server:", payload);
         
       } catch (err) {
         console.error("Error retrieving location:", err);
